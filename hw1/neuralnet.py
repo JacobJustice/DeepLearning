@@ -3,6 +3,30 @@ import torch.nn as nn
 import torchvision
 import torchvision.transforms as transforms
 
+# helper function for updating model based on loss of given x inputs and correct y outputs
+# returns loss from criterion
+def update_model(x_i, y_i, model, optimizer, criterion, no_unsqueeze=False, no_float=False):
+    if not no_float:
+        output = model(x_i.float())
+    else:
+        output = model(x_i)
+
+    if not no_unsqueeze:
+        y_i = y_i.unsqueeze(1)
+
+    if not no_float:
+        loss = criterion(output, y_i.float())
+    else:
+        loss = criterion(output, y_i)
+
+    #print(loss)
+    out_loss = loss.item()
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+
+
+    return out_loss
 
 # Neural network with linear hidden layers
 class NeuralNet(nn.Module):

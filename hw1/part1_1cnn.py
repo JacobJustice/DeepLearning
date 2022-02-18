@@ -15,9 +15,9 @@ import torchvision.transforms as transforms
 # 
 input_size = 1
 output_size = 1
-batch_size = 100
+batch_size = 200
 learning_rate = 0.001
-num_epochs = 100
+num_epochs = 500
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -39,22 +39,6 @@ train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
 test_loader = torch.utils.data.DataLoader(dataset=test_dataset, 
                                           batch_size=batch_size, 
                                           shuffle=False)
-
-# helper function for updating model based on loss of given x inputs and correct y outputs
-# returns loss from criterion
-def update_model(x_i, y_i, model, optimizer, criterion,model_num=0):
-    output = model(x_i)
-    loss = criterion(output, y_i)
-    out_loss = loss.item()
-
-    optimizer.zero_grad()
-    loss.backward()
-    optimizer.step()
-
-    if (i+1) % 600== 0:
-        print (f'Model {model_num}, Epoch [{epoch+1}/{num_epochs}], Step [{i+1}/{n_total_steps}], Loss: {out_loss:.4f}')
-
-    return out_loss
 
 #examples = iter(test_loader)
 #example_data, example_targets = examples.next()
@@ -100,42 +84,11 @@ model_2 = nn.Sequential(
 	nn.ReLU(),
 	nn.Linear(42,10)
 	).to(device)
-#conv1 = nn.Conv2d(1, 6, 5)
-#pool = nn.MaxPool2d(2, 2)
-#relu = nn.ReLU()
-#conv2 = nn.Conv2d(6,16,5)
-#conv3 = nn.Conv2d(16,10,3)
-#fc1 = nn.Linear(10*1*1, 120)
-#fc2 = nn.Linear(120,84)
-#fc3 = nn.Linear(84,10)
-#
-#x = conv1(example_data)
-#print("conv1",x.shape)
-#x = relu(x)
-#print("relu",x.shape)
-#x = pool(x)
-#print("pool",x.shape)
-#x = conv2(x)
-#print("conv2",x.shape)
-#x = relu(x)
-#print("relu",x.shape)
-#x = pool(x)
-#print("pool",x.shape)
-#x = conv3(x)
-#print("conv3",x.shape)
-#x = relu(x)
-#print("relu",x.shape)
-#x = pool(x)
-#print(x.shape)
-#x = x.view(-1, 10*1*1)
-#print("pool_flatten",x.shape)
-#x = fc1(x)
-#print("fc1",x.shape)
-#x = fc2(x)
-#print("fc2",x.shape)
-#x = fc3(x)
-#print("fc3",x.shape)
-#print(x)
+conv1 = nn.Conv2d(1, 6, 5)
+relu = nn.ReLU()
+pool = nn.MaxPool2d(2, 2)
+fc1 = nn.Linear(10*1*1, 120)
+fc2 = nn.Linear(84,10)
 
 criterion = nn.CrossEntropyLoss()
 optimizer_1 = torch.optim.SGD(model_1.parameters(), lr=learning_rate)
@@ -145,8 +98,10 @@ optimizer_2 = torch.optim.SGD(model_2.parameters(), lr=learning_rate)
 n_total_steps = len(train_loader)
 mean_epoch_loss_1 = []
 mean_epoch_loss_2 = []
-mean_epoch_acc_1 = []
-mean_epoch_acc_2 = []
+mean_epoch_test_acc_1 = []
+mean_epoch_test_acc_2 = []
+mean_epoch_train_acc_1 = []
+mean_epoch_train_acc_2 = []
 #mean_epoch_loss_3 = []
 for epoch in range(num_epochs):
     loss_list_1 = []
@@ -174,14 +129,28 @@ for epoch in range(num_epochs):
             n_samples += labels.size(0)
             n_correct_1 += (predicted_1 == labels).sum().item()
             n_correct_2 += (predicted_2 == labels).sum().item()
-
-        acc_1 = n_correct_1 / n_samples
-        acc_2 = n_correct_2 / n_samples
+        test_acc_1 = n_correct_1 / n_samples
+        test_acc_2 = n_correct_2 / n_samples
+        mean_epoch_test_acc_1.append(test_acc_1)
+        mean_epoch_test_acc_2.append(test_acc_2)
+        for images, labels in test_loader:
+            images = images.to(device)
+            labels = labels.to(device)
+            outputs_1 = model_1(images)
+            outputs_2 = model_2(images)
+            # max returns (value ,index)
+            _, predicted_1 = torch.max(outputs_1.data, 1)
+            _, predicted_2 = torch.max(outputs_2.data, 1)
+            n_samples += labels.size(0)
+            n_correct_1 += (predicted_1 == labels).sum().item()
+            n_correct_2 += (predicted_2 == labels).sum().item()
+        train_acc_1 = n_correct_1 / n_samples
+        train_acc_2 = n_correct_2 / n_samples
+        mean_epoch_train_acc_1.append(train_acc_1)
+        mean_epoch_train_acc_2.append(train_acc_2)
     mean_epoch_loss_1.append(sum(loss_list_1)/len(loss_list_1))
     mean_epoch_loss_2.append(sum(loss_list_2)/len(loss_list_2))
 
-    mean_epoch_acc_1.append(acc_1)
-    mean_epoch_acc_2.append(acc_2)
 #    mean_epoch_loss_3.append(sum(loss_list_3)/len(loss_list_3))
     print()
 
@@ -197,9 +166,10 @@ ax[0].set_xlabel('Epoch')
 ax[0].set_ylabel('Loss')
 ax[0].legend()
 
-ax[1].plot(range(len(mean_epoch_acc_1)), mean_epoch_acc_1,label='model_1 acc',color='red')
-ax[1].plot(range(len(mean_epoch_acc_2)), mean_epoch_acc_2,label='model_2 acc',color='green')
-#ax[1].plot(range(len(mean_epoch_acc_3)), mean_epoch_acc_3,label='model_3 acc',color='blue')
+ax[1].plot(range(len(mean_epoch_test_acc_1)), mean_epoch_test_acc_1,label='model_1 acc test',color='red')
+ax[1].plot(range(len(mean_epoch_test_acc_2)), mean_epoch_test_acc_2,label='model_2 acc test',color='green')
+ax[1].plot(range(len(mean_epoch_train_acc_1)), mean_epoch_train_acc_1,label='model_1 acc train',color='orange')
+ax[1].plot(range(len(mean_epoch_train_acc_2)), mean_epoch_train_acc_2,label='model_2 acc train',color='blue')
 ax[1].set_title('Model Accuracy')
 ax[1].set_xlabel('Epoch')
 ax[1].set_ylabel('Accuracy')
