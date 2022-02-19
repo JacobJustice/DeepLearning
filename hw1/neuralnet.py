@@ -3,9 +3,18 @@ import torch.nn as nn
 import torchvision
 import torchvision.transforms as transforms
 
+def get_grad_norm(model):
+    grad_all = 0.0
+    for p in model.parameters():
+        grad = 0.0
+        if p.grad is not None:
+            grad = (p.grad.cpu().data.numpy() ** 2).sum()
+        grad_all += grad
+    return grad_all ** 0.5
+
 # helper function for updating model based on loss of given x inputs and correct y outputs
 # returns loss from criterion
-def update_model(x_i, y_i, model, optimizer, criterion, no_unsqueeze=False, no_float=False):
+def update_model(x_i, y_i, model, optimizer, criterion, no_unsqueeze=False, no_float=False, grad_norm=False, device=None):
     if not no_float:
         output = model(x_i.float())
     else:
@@ -18,6 +27,10 @@ def update_model(x_i, y_i, model, optimizer, criterion, no_unsqueeze=False, no_f
         loss = criterion(output, y_i.float())
     else:
         loss = criterion(output, y_i)
+
+    if grad_norm:
+        loss = criterion(get_grad_norm(model), 0)
+
 
     #print(loss)
     out_loss = loss.item()

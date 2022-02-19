@@ -9,7 +9,7 @@ import torch
 import torch.nn as nn
 import torchvision
 import torchvision.transforms as transforms
-from neuralnet import NeuralNet, update_model
+from neuralnet import NeuralNet, update_model, get_grad_norm
 from dataset_objs import FunctionDataset, TimeSeriesDataset
 
 
@@ -48,35 +48,20 @@ model = NeuralNet(input_size, num_layers=num_layers, hidden_size=hidden_size, nu
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 print("model.num_parameters()",model.num_parameters(),num_layers,hidden_size)
 
-def get_grad_norm(model):
-    grad_all = 0.0
-    for p in model.parameters():
-        grad = 0.0
-        if p.grad is not None:
-            grad = (p.grad.cpu().data.numpy() ** 2).sum()
-        grad_all += grad
-    return grad_all ** 0.5
-
-class GradNorm(nn.Module):
-    def __init__(self, model):
-        super(GradNorm,self).__init__()
-        self.model = model
-    def forward(self, outputs, labels):
-        return torch.tensor(get_grad_norm(self.model),dtype=torch.float32,device=device,requires_grad=True)
-
 # Training
 n_total_steps = len(train_loader)
 mean_epoch_loss = []
 batch_loss = []
-grad_norm_list = [get_grad_norm(model)]
+grad_norm_list = []
 for epoch in range(num_epochs):
-    if epoch >= num_epochs/2:
-        criterion = GradNorm(model)
     loss_list = []
     for i, (x_i, y_i) in enumerate(train_loader):
         x_i = x_i.reshape(-1, input_size).to(device)
         y_i = y_i.to(device)
-        loss_list.append(update_model(x_i, y_i, model, optimizer, criterion))
+        if epoch >= num_epochs/2:
+            loss_list.append(update_model(x_i, y_i, model, optimizer, criterion, grad_norm=True,device=device))
+        else:
+            loss_list.append(update_model(x_i, y_i, model, optimizer, criterion))
         grad_norm_list.append(get_grad_norm(model))
 
         if (i+1) % 10 == 0:
@@ -101,6 +86,7 @@ with torch.no_grad():
     X = X.reshape(len(X),1)
     y_predicted = model(X)
 
+print(grad_norm_list)
 ax[1].plot(range(len(grad_norm_list)), grad_norm_list,label='model grad norm',color='green')
 ax[1].set_xlabel('Iteration')
 ax[1].set_ylabel('Grad Norm')
