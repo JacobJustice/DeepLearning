@@ -103,7 +103,7 @@ for epoch in range(num_epochs):
 
 fig, ax = plt.subplots(2,1)
 fig.tight_layout()
-fig.set_size_inches(14,13.5)
+fig.set_size_inches(8,6)
 ax[0].plot(range(len(mean_epoch_loss_1)), mean_epoch_loss_1,label='model_1 loss',color='red')
 ax[0].plot(range(len(mean_epoch_loss_2)), mean_epoch_loss_2,label='model_2 loss',color='green')
 ax[0].plot(range(len(mean_epoch_loss_3)), mean_epoch_loss_3,label='model_3 loss',color='blue')

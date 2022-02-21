@@ -113,19 +113,19 @@ for m in range(len(models)):
 
 fig, ax = plt.subplots(2,1)
 fig.tight_layout()
-fig.set_size_inches(14,13.5)
+fig.set_size_inches(10,8)
 ax[0].scatter([m.num_parameters() for m in models], train_epoch_loss_list,label='train loss',color='blue')
 ax[0].scatter([m.num_parameters() for m in models], test_epoch_loss_list,label='test loss',color='orange')
 ax[0].set_yscale('log')
 ax[0].set_title('Model Loss')
-ax[0].set_xlabel('Iteration')
+ax[0].set_xlabel('Number of Parameters')
 ax[0].set_ylabel('Loss')
 ax[0].legend()
 
 ax[1].scatter([m.num_parameters() for m in models], train_acc_list,label='train acc',color='blue')
 ax[1].scatter([m.num_parameters() for m in models], test_acc_list,label='test acc',color='orange')
 ax[1].set_title('Model Accuracy')
-ax[1].set_xlabel('Iteration')
+ax[1].set_xlabel('Number of Parameters')
 ax[1].set_ylabel('Accuracy')
 ax[1].legend()
 
