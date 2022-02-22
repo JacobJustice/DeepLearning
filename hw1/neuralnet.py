@@ -29,7 +29,8 @@ def update_model(x_i, y_i, model, optimizer, criterion, no_unsqueeze=False, no_f
         loss = criterion(output, y_i)
 
     if grad_norm:
-        loss = criterion(get_grad_norm(model), 0)
+        loss = criterion(torch.tensor([get_grad_norm(model)],dtype=torch.float32,requires_grad=True)
+                        ,torch.tensor([0],dtype=torch.float32,requires_grad=True))
 
 
     #print(loss)

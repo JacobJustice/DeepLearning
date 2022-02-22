@@ -4,6 +4,7 @@ import pylab as pl
 import numpy as np
 from torch.utils.data import Dataset
 import math
+from neuralnet import update_model
 
 import torch
 import torch.nn as nn
@@ -110,8 +111,8 @@ for epoch in range(num_epochs):
     for i, (x_i, y_i) in enumerate(train_loader):
         x_i = x_i.to(device)
         y_i = y_i.to(device)
-        loss_list_1.append(update_model(x_i, y_i, model_1, optimizer_1, criterion,1))
-        loss_list_2.append(update_model(x_i, y_i, model_2, optimizer_2, criterion,2))
+        loss_list_1.append(update_model(x_i, y_i, model_1, optimizer_1, criterion))
+        loss_list_2.append(update_model(x_i, y_i, model_2, optimizer_2, criterion))
 #        loss_list_3.append(update_model(x_i, y_i, model_3, optimizer_3, criterion))
    
     with torch.no_grad():
