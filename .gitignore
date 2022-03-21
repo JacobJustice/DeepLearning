@@ -1,4 +1,9 @@
 data/*
+hw2/data/*
+hw2/data/*/*
+#.npy
+#.avi
+
 todo*
 
 # Byte-compiled / optimized / DLL files

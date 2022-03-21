@@ -22,7 +22,7 @@ output_size = 10
 batch_size = 200
 num_models = 8
 learning_rate = 0.005
-num_epochs = 100
+num_epochs = 47
 N_epochs = 3 # after N epochs record parameters
 
 # device config
@@ -82,6 +82,7 @@ for t in range(num_models):
             y_i = y_i.reshape(batch_size).to(device)
             loss_list.append(update_model(x_i, y_i, model, optimizer, criterion,no_unsqueeze=True,no_float=True))
             if (i+1) % 100 == 0:
+                print('model',t)
                 print (f'Epoch [{epoch+1}/{num_epochs}], Step [{i+1}/{n_total_steps}], Loss: {loss_list[-1]:.4f}')
 
         # Accuracy
