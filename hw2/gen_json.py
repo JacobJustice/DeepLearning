@@ -1,6 +1,7 @@
 import json
 
 def generate_reverse(dictionary):
+    #print(dictionary)
     return {v: k for k, v in dictionary.items()}
 
 if __name__ == "__main__":

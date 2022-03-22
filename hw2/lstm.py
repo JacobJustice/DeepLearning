@@ -15,6 +15,7 @@ import json
 
 
 a = np.load('./data/training_data/feat/a-cek0mvXxE_15_25.avi.npy')
+print(a)
 
 # pick from distribution : [.01, .2, .001, .04 ...]
 
