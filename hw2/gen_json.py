@@ -12,10 +12,10 @@ if __name__ == "__main__":
     # 0: Unknown token
     # 1: Beginning of Sentence
     # 2: End of Sentence
-    word_tokens = { 0:'<UNK>',
+    word_tokens = { 0:'<PAD>',
                     1:'<BOS>',
                     2:'<EOS>',
-                    3:'<PAD>',
+                    3:'<UNK>',
                     3:'.',
                     4:',',
                     5:'!'

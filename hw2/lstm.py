@@ -11,12 +11,11 @@ from gen_json import generate_reverse
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torchvision
-import torchvision.transforms as transforms
 from torch.optim.lr_scheduler import ExponentialLR
 from lstm_objs import Decoder_LSTM, VideoDataset
 import os
 import json
+from module import S2VT
 
 # Sequential ( LSTM -> Softmax )k
 torch.set_default_dtype(torch.double)
@@ -37,9 +36,9 @@ training_data = make_dataset('./data/training_data/feat/','./data/training_label
 training_X = [x for x, y in training_data]
 training_Y = [y for x, y in training_data]
 training_set = VideoDataset(training_X,training_Y)
-#val_X = [x for x, y in training_data[int(.9*len(training_data)):]]
-#val_Y = [y for x, y in training_data[int(.9*len(training_data)):]]
-#val_set = VideoDataset(val_X,val_Y)
+val_X = [x for x, y in training_data[int(.9*len(training_data)):]]
+val_Y = [y for x, y in training_data[int(.9*len(training_data)):]]
+val_set = VideoDataset(val_X,val_Y)
 
 batch_size = 100
 learning_rate = 0.001
@@ -49,10 +48,10 @@ train_loader = torch.utils.data.DataLoader(dataset=training_set
                                             , shuffle=True
                                             , pin_memory=True)
 
-#val_loader = torch.utils.data.DataLoader(dataset=val_set
-#                                            , batch_size=batch_size
-#                                            , shuffle=True
-#                                            , pin_memory=True)
+val_loader = torch.utils.data.DataLoader(dataset=val_set
+                                            , batch_size=batch_size
+                                            , shuffle=True
+                                            , pin_memory=True)
 
 
 print("done loading data!")
@@ -123,8 +122,6 @@ for epoch in range(num_epochs):
     scheduler.step()
     print('new lr:',scheduler.get_last_lr())
     epoch_loss.append(sum(step_loss)/len(step_loss))
-        
-       
 
 print("saving model...")
 torch.save(model, 'model_'+str(int(time.time()))+'.model')
