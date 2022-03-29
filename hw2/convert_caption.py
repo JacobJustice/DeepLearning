@@ -90,9 +90,15 @@ def convert_caption_ind(caption_str, word_tokens, reverse_word_tokens, num_words
             index = 0
         #print(i, index, word)
         caption_list[i] = int(index)
+    
+    #remove end character
+    caption_list = caption_list[:-1]
+    #insert <BOS>
+    caption_list = np.insert(caption_list,0,1)
 
     return caption_list
 
+# caption_list: a list of indices
 def construct_caption_ind(caption_list, word_tokens):
     out_sentence = ""
     for i, word_ind in enumerate(caption_list):

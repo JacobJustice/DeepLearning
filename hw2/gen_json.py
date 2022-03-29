@@ -1,5 +1,9 @@
 import json
 
+"""
+Run this to generate a word_tokens.json file
+"""
+
 def generate_reverse(dictionary):
     #print(dictionary)
     return {v: k for k, v in dictionary.items()}
