@@ -96,13 +96,14 @@ def convert_caption_ind(caption_str, word_tokens, reverse_word_tokens, num_words
 def construct_caption_ind(caption_list, word_tokens):
     out_sentence = ""
     for i, word_ind in enumerate(caption_list):
-        word_ind = word_ind.item()
+        #word_ind = word_ind.item()
         if word_ind == 2:
             break
-        choice_word = word_tokens[str(word_ind)]
-        if choice_word in punctuation:
-            out_sentence = out_sentence[:-1]
-        out_sentence += word_tokens[str(word_ind)] + ' '
+        if word_ind != 0:
+            choice_word = word_tokens[str(word_ind)]
+            if choice_word in punctuation:
+                out_sentence = out_sentence[:-1]
+            out_sentence += word_tokens[str(word_ind)] + ' '
 
     return out_sentence
 
