@@ -9,7 +9,7 @@ from pprint import pprint
 
 EPOCH = 3000
 BATCH_SIZE = 10
-LEARNING_RATE = 0.0001
+LEARNING_RATE = 0.001
 vocab_size = len(word_tokens)
 print('VOCAB SIZE', vocab_size)
 
@@ -24,7 +24,7 @@ train_loader = torch.utils.data.DataLoader(dataset=training_set
                                             
 if __name__ == "__main__":
     s2vt = S2VT(vocab_size=vocab_size, batch_size=BATCH_SIZE, hidden=500)
-    s2vt.load_state_dict(torch.load("./s2vt_params_oops.pkl"))
+    # s2vt.load_state_dict(torch.load("./s2vt_params_oops.pkl"))
     s2vt = s2vt.cuda()
     loss_func = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(s2vt.parameters(), lr=LEARNING_RATE)
@@ -58,7 +58,7 @@ if __name__ == "__main__":
                 # print(cap_out,cap_out.shape)
                 #write_txt(epoch, i, loss)
             if i%2000 == 0:
-                torch.save(s2vt.state_dict(), "s2vt_params.pkl")
+                torch.save(s2vt.state_dict(), "s2vt_params_experimental.pkl")
                 print("Epoch: %d iter: %d save successed!" % (epoch, i))
                 s2vt.eval()
                 cap_out = s2vt(video, caption)
