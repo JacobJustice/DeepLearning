@@ -60,6 +60,53 @@ def convert_caption(caption_str, word_tokens, reverse_word_tokens, num_words=80)
 
     return np.array(list(caption_matrix))
 
+#
+# returns a list of indices that key into the reverse_word_tokens dictionary
+#   telling you which word it belongs to
+#
+def convert_caption_ind(caption_str, word_tokens, reverse_word_tokens, num_words=80):
+    caption_list = np.zeros(num_words, dtype=np.dtype(np.int32))
+    caption_list[:] = 2
+
+    # properly isolate punctuation as it's own word
+    split_caption = caption_str.split()
+    for i, word in enumerate(split_caption):
+        if len(word) > 1:
+            if ',' in word or '.' in word or '!' in word:
+                #print(word)
+                del split_caption[i]
+                split_word = re.split('(\.|!|,)', word)
+                split_caption.insert(i, split_word[0])
+                split_caption.insert(i+1, split_word[1])
+
+    #print(len(split_caption),split_caption)
+    for i, word in enumerate(split_caption):
+        try:
+            # find index of this word in word_vec
+            index = reverse_word_tokens[word]
+        except KeyError:
+            # if word isn't in known word_tokens give index of unknown
+            #print(i,word,'key error!')
+            index = 0
+        #print(i, index, word)
+        caption_list[i] = int(index)
+
+    return caption_list
+
+def construct_caption_ind(caption_list, word_tokens):
+    out_sentence = ""
+    for i, word_ind in enumerate(caption_list):
+        word_ind = word_ind.item()
+        if word_ind == 2:
+            break
+        choice_word = word_tokens[str(word_ind)]
+        if choice_word in punctuation:
+            out_sentence = out_sentence[:-1]
+        out_sentence += word_tokens[str(word_ind)] + ' '
+
+    return out_sentence
+
+
 def construct_caption(caption_matrix, word_tokens):
     out_sentence = ""
     for i, word_vec in enumerate(caption_matrix):
@@ -83,13 +130,15 @@ if __name__ == "__main__":
         word_tokens = json.load(fp)
         reverse_word_tokens = generate_reverse(word_tokens)
 
-    for i in range(100):
-        caption_matrix = convert_caption('A chef, prepares raw poultry.',word_tokens,reverse_word_tokens)
-        #print('output',construct_caption(caption_matrix,word_tokens))
-        caption_matrix = convert_caption("The parakeet pecked at the phone's numbers and made a call!",word_tokens,reverse_word_tokens)
-        #print('output',construct_caption(caption_matrix,word_tokens))
-        caption_matrix = convert_caption("A man and two women walk across the beach.",word_tokens,reverse_word_tokens) 
-        #print('output',construct_caption(caption_matrix,word_tokens))
+    caption_matrix = convert_caption_ind('A chef, prepares raw poultry.',word_tokens,reverse_word_tokens)
+    print(caption_matrix)
+    print('output',construct_caption_ind(caption_matrix,word_tokens))
+    caption_matrix = convert_caption_ind("The parakeet pecked at the phone's numbers and made a call!",word_tokens,reverse_word_tokens)
+    print(caption_matrix)
+    print('output',construct_caption_ind(caption_matrix,word_tokens))
+    caption_matrix = convert_caption_ind("A man and two women walk across the beach.",word_tokens,reverse_word_tokens) 
+    print(caption_matrix)
+    print('output',construct_caption_ind(caption_matrix,word_tokens))
 
 #    training_dataset = make_dataset('./data/training_data/feat/', './data/training_label.json')
 #    with open('./data/training_data_x.npy','wb') as fp:
