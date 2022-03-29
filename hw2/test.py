@@ -18,6 +18,7 @@ test_loader = torch.utils.data.DataLoader(dataset=testing_set
                                             , shuffle=True
                                             , pin_memory=True)
 
+testing_labels = json.load()
 
 if __name__ == "__main__":
     s2vt = S2VT(vocab_size=vocab_size, batch_size=BATCH_SIZE)
@@ -40,13 +41,15 @@ if __name__ == "__main__":
         captions = [[row[i] for row in captions] for i in range(len(captions[0]))]
         caption = caption.tolist()
 
-        for i, in enumerate(captions)
+        for j, in enumerate(captions):
+            vid_ind = i*BATCH_SIZE+j
+            print(y_list[vid_ind][0]],)
 
 
-        for i, (cap_y, cap_yhat) in enumerate(zip(captions, caption)):
-            #print(cap_y,cap_yhat)
-            print()
-            print('............................\nModel Caption:\n')
-            print(construct_caption_ind(cap_y, word_tokens))
-            print('............................\nCorrect Caption:\n')
-            print(construct_caption_ind(cap_yhat, word_tokens))
+        #for i, (cap_y, cap_yhat) in enumerate(zip(captions, caption)):
+        #    #print(cap_y,cap_yhat)
+        #    print()
+        #    print('............................\nModel Caption:\n')
+        #    print(construct_caption_ind(cap_y, word_tokens))
+        #    print('............................\nCorrect Caption:\n')
+        #    print(construct_caption_ind(cap_yhat, word_tokens))
