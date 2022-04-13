@@ -65,6 +65,9 @@ if __name__ == "__main__":
         for j, j_cap in enumerate(captions):
             #most_likely = beam_search_decoder(j_cap, 1)
             caption_string = construct_caption_ind(j_cap, word_tokens)
+            with open('./output_test.txt','w') as fp:
+                fp.write(y_list[0][j] + ',' + caption_string+'\n')
+
             print(y_list[0][j], caption_string,sep=',')
             
         #for i, (cap_y, cap_yhat) in enumerate(zip(captions, caption)):
